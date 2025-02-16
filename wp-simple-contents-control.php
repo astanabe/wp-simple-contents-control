@@ -43,7 +43,7 @@ function wp_simple_contents_control_if_user($atts, $content = null) {
 	if (!is_user_logged_in()) {
 		return '';
 	}
-	$atts = shortcode_atts(array('is' => ''), $atts, 'if-user');
+	$atts = shortcode_atts(['is' => ''], $atts, 'if-user');
 	$users = array_map('trim', explode(',', strtolower($atts['is'])));
 	$user = wp_get_current_user();
 	if (array_intersect($users, $user->user_login)) {
@@ -58,7 +58,7 @@ function wp_simple_contents_control_if_role($atts, $content = null) {
 	if (!is_user_logged_in()) {
 		return '';
 	}
-	$atts = shortcode_atts(array('is' => ''), $atts, 'if-role');
+	$atts = shortcode_atts(['is' => ''], $atts, 'if-role');
 	$roles = array_map('trim', explode(',', strtolower($atts['is'])));
 	$roles = array_map(function($role) {
 		return preg_replace('/ +/', '-', $role);
@@ -77,19 +77,19 @@ function wp_simple_contents_control_if_group($atts, $content = null) {
 	if (!is_user_logged_in()) {
 		return '';
 	}
-	$atts = shortcode_atts(array('is' => ''), $atts, 'if-group');
+	if (!function_exists('groups_get_user_groups')) {
+		return '';
+	}
+	$atts = shortcode_atts(['is' => ''], $atts, 'if-group');
 	$groups = array_map('trim', explode(',', strtolower($atts['is'])));
 	$groups = array_map(function($group) {
 		return preg_replace('/ +/', '-', $group);
 	}, $groups);
 	$user_id = get_current_user_id();
-	if (!function_exists('groups_get_user_groups')) {
-		return '';
-	}
 	$user_groups = groups_get_user_groups($user_id);
 	$user_group_ids = $user_groups['groups'];
 	foreach ($groups as $group_name) {
-		$group = groups_get_group(array('group_id' => 0, 'search_terms' => $group_name, 'per_page' => 1));
+		$group = groups_get_group(['group_id' => 0, 'search_terms' => $group_name, 'per_page' => 1]);
 		if (!empty($group) && isset($group['groups'][0]->id)) {
 			$group_id = $group['groups'][0]->id;
 			if (in_array($group_id, $user_group_ids)) {
