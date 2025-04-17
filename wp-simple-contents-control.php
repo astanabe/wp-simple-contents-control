@@ -108,3 +108,37 @@ function wp_simple_contents_control_search_form() {
 	return ob_get_clean();
 }
 add_shortcode('search-form', 'wp_simple_contents_control_search_form');
+
+// Add shortcode for inserting site_title
+function wp_simple_contents_control_site_title($atts) {
+	return esc_attr(get_bloginfo('name'));
+}
+add_shortcode('site-title', 'wp_simple_contents_control_site_title');
+
+// Add shortcode for inserting user_login
+function wp_simple_contents_control_user_login($atts) {
+	if (!is_user_logged_in()) {
+		return '';
+	}
+	$user = wp_get_current_user();
+	return esc_attr($user->user_login);
+}
+add_shortcode('user-login', 'wp_simple_contents_control_user_login');
+
+// Add shortcode for inserting profile_url
+function wp_simple_contents_control_profile_url($atts) {
+	if (!is_user_logged_in() || !function_exists('bp_members_get_user_url')) {
+		return '';
+	}
+	return esc_url(bp_members_get_user_url(get_current_user_id()));
+}
+add_shortcode('profile-url', 'wp_simple_contents_control_profile_url');
+
+// Add shortcode for inserting settings_url
+function wp_simple_contents_control_settings_url($atts) {
+	if (!is_user_logged_in() || !function_exists('bp_members_get_user_url') || !function_exists('bp_members_get_path_chunks')) {
+		return '';
+	}
+	return esc_url(bp_members_get_user_url(get_current_user_id(), bp_members_get_path_chunks(['settings'])));
+}
+add_shortcode('settings-url', 'wp_simple_contents_control_settings_url');
